@@ -1,0 +1,40 @@
+{
+  "entities": {
+    "SavedAd": {
+      "title": "SavedAd",
+      "description": "A previously generated WhatsApp ad.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Product name" },
+        "price": { "type": "string", "description": "Product price" },
+        "location": { "type": "string", "description": "Product location" },
+        "text": { "type": "string", "description": "The generated ad text" },
+        "userId": { "type": "string", "description": "The UID of the user who saved it" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the ad was saved" }
+      },
+      "required": ["name", "price", "location", "text", "userId", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile information.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/saved_ads/{adId}": {
+      "schema": "SavedAd",
+      "description": "Collection of saved ads for users."
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents."
+    }
+  }
+}

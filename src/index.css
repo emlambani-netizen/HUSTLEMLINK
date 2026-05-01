@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #0D1B2A;
+  --color-whatsapp: #25D366;
+  --color-whatsapp-dark: #128C7E;
+  --color-accent: #F27D26;
+  
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-navy text-white antialiased overflow-x-hidden;
+  }
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
+}
+
+.glow-orange {
+  box-shadow: 0 0 20px rgba(242, 125, 38, 0.4);
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.tilt-25 {
+  transform: perspective(1000px) rotateY(-15deg) rotateX(10deg);
+}
+
+.card-3d {
+  @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(37,211,102,0.2)];
+}

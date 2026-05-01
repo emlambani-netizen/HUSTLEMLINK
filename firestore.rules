@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Globals
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity Validations
+    function isValidSavedAd(data) {
+      return data.keys().hasAll(['name', 'price', 'location', 'text', 'userId', 'createdAt'])
+        && data.keys().size() == 6
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 200
+        && data.price is string && data.price.size() > 0 && data.price.size() <= 50
+        && data.location is string && data.location.size() > 0 && data.location.size() <= 100
+        && data.text is string && data.text.size() > 0 && data.text.size() <= 2000
+        && data.userId == request.auth.uid
+        && data.createdAt == request.time;
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['email', 'createdAt'])
+        && data.keys().size() >= 2
+        && data.email == request.auth.token.email
+        && data.createdAt == request.time;
+    }
+
+    // Collections
+    match /saved_ads/{adId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(adId) && isValidSavedAd(incoming());
+      allow update: if false; // Ads are immutable for now, delete and recreate
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && userId == request.auth.uid;
+      allow create: if isSignedIn() && userId == request.auth.uid && isValidUserProfile(incoming());
+      allow update: if isSignedIn() && userId == request.auth.uid 
+        && incoming().email == existing().email // email immutable
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL']);
+    }
+  }
+}
